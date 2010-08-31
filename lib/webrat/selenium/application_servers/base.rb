@@ -15,6 +15,7 @@ module Webrat
         def stop_at_exit
           at_exit do
             stop
+            wait_for_socket_close
           end
         end
 
@@ -33,6 +34,17 @@ module Webrat
           end
           rescue SocketError
           fail
+        end
+        
+        def wait_for_socket_close
+          silence_stream(STDOUT) do
+            TCPSocket.wait_for_service_termination_with_timeout \
+              :host => "0.0.0.0",
+              :port => Webrat.configuration.application_port.to_i,
+              :timeout => 30
+          end
+        rescue SocketError
+          true
         end
 
         def prepare_pid_file(file_path, pid_file_name)
