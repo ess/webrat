@@ -12,7 +12,7 @@ module Webrat
         end
 
         def stop
-          Process.kill("TERM", @pid)
+          Process.kill("INT", @pid)
         end
 
         def fail
